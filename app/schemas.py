@@ -10,18 +10,19 @@ class Source(BaseModel):
     published: str | None = None
 
 
-class Sentiment(BaseModel):
-    left: float
-    centre: float
-    right: float
+class OutletAnalysis(BaseModel):
+    outlet: str
+    lean: str
+    angle: str
+    bias_notes: str
+    articles: list[Source]
 
 
 class Cluster(BaseModel):
     id: str
     neutral_headline: str
-    narrative: str
-    sentiment: Sentiment
-    sources: list[Source]
+    unbiased_summary: str
+    outlets: list[OutletAnalysis]
 
 
 class NewsResponse(BaseModel):
