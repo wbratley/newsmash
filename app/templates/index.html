@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Newsmash — Today's News{% endblock %}
+
+{% block head %}
+<style>
+  .page-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .story-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .story-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 1.5rem;
+    align-items: center;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .story-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border-color: #d1d5db;
+  }
+
+  .story-headline {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .story-headline a:hover { text-decoration: underline; }
+
+  .story-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .story-meta .stat {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .story-meta .divider { color: var(--border); }
+
+  .lean-dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .story-index {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 1.5rem;
+    text-align: right;
+    align-self: start;
+    padding-top: 0.2rem;
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+  }
+  .no-data h2 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text); }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if not data %}
+  <div class="no-data">
+    <h2>No stories yet today</h2>
+    <p>Hit <code>GET /news/today</code> to generate today's digest, then refresh.</p>
+  </div>
+{% else %}
+  <p class="page-title">{{ data.cluster_count }} stories · {{ data.generated_at[:10] }}</p>
+  <div class="story-grid">
+    {% for cluster in data.clusters %}
+    {% set outlet_count = cluster.outlets | length %}
+    {% set article_count = cluster.outlets | map(attribute='articles') | map('length') | sum %}
+    <a href="/story/{{ cluster.id }}" style="display:contents;">
+      <div class="story-card">
+        <div>
+          <div class="story-headline">{{ cluster.neutral_headline }}</div>
+          <div class="story-meta">
+            <span class="stat">{{ outlet_count }} outlet{{ 's' if outlet_count != 1 }}</span>
+            <span class="divider">·</span>
+            <span class="stat">{{ article_count }} article{{ 's' if article_count != 1 }}</span>
+            <span class="divider">·</span>
+            <span class="lean-dots">
+              {% for outlet in cluster.outlets %}
+              <span class="lean-dot lean-{{ outlet.lean }}" title="{{ outlet.outlet }} ({{ outlet.lean }})"></span>
+              {% endfor %}
+            </span>
+          </div>
+        </div>
+        <div class="story-index">#{{ loop.index }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}
