@@ -2,7 +2,7 @@ import asyncio
 import logging
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter
 
 from app.config import settings
 from app.schemas import NewsResponse
@@ -15,26 +15,18 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/news", tags=["news"])
 
+_CACHE_KEY = "news"
+
 
 @router.get("/today", response_model=NewsResponse, summary="Get today's news synthesised from all sources")
-async def get_today(
-    max_clusters: int = Query(
-        default=None,
-        ge=1,
-        le=100,
-        description="Maximum number of topic clusters to return (default from config)",
-    )
-) -> NewsResponse:
-    limit = max_clusters if max_clusters is not None else settings.max_clusters
-    cache_key = f"news_{limit}"
-
-    cached = load_today(cache_key)
+async def get_today() -> NewsResponse:
+    cached = load_today(_CACHE_KEY)
     if cached:
-        logger.info("Serving today's news from cache (key=%s)", cache_key)
+        logger.info("Serving today's news from cache")
         return NewsResponse.model_validate(cached)
 
     stories = await fetch_all_feeds()
-    clusters = cluster_stories(stories)[:limit]
+    clusters = cluster_stories(stories)[: settings.max_clusters]
 
     synthesised = await asyncio.gather(
         *[synthesise_cluster(f"cluster-{i}", cluster) for i, cluster in enumerate(clusters)]
@@ -45,5 +37,5 @@ async def get_today(
         cluster_count=len(synthesised),
         clusters=list(synthesised),
     )
-    save_today(cache_key, result.model_dump(mode="json"))
+    save_today(_CACHE_KEY, result.model_dump(mode="json"))
     return result

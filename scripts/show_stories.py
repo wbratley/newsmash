@@ -6,7 +6,6 @@ import textwrap
 import httpx
 
 BASE_URL = "http://localhost:8000"
-MAX_CLUSTERS = int(sys.argv[1]) if len(sys.argv) > 1 else 10
 
 LEAN_LABEL = {
     "left": "left",
@@ -25,9 +24,9 @@ def wrap(text: str, indent: str = INDENT) -> str:
 
 
 def main() -> None:
-    print(f"Fetching top {MAX_CLUSTERS} stories from {BASE_URL} ...\n")
+    print(f"Fetching today's stories from {BASE_URL} ...\n")
     try:
-        r = httpx.get(f"{BASE_URL}/news/today", params={"max_clusters": MAX_CLUSTERS}, timeout=120)
+        r = httpx.get(f"{BASE_URL}/news/today", timeout=120)
         r.raise_for_status()
     except httpx.ConnectError:
         sys.exit("Error: server not running at " + BASE_URL)
