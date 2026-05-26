@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from app.routers import news
+from app.routers import news, web
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,6 +16,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.include_router(web.router)
 app.include_router(news.router)
 
 
