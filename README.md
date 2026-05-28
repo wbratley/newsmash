@@ -1,4 +1,4 @@
-# Newsmash
+# Newshash
 
 Fetches RSS feeds from 10 UK news outlets across the political spectrum, clusters stories that cover the same event, then uses Claude to write an unbiased summary and analyse how each outlet frames the story differently.
 
@@ -27,7 +27,7 @@ The first page load will take up to 30 seconds while it fetches feeds and calls 
 docker compose down
 ```
 
-The daily cache is stored in a Docker volume (`newsmash_cache`) so it survives restarts.
+The daily cache is stored in a Docker volume (`newshash_cache`) so it survives restarts.
 
 ### Updating
 
