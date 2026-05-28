@@ -74,22 +74,10 @@
     padding-top: 0.2rem;
   }
 
-  .no-data {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--muted);
-  }
-  .no-data h2 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text); }
 </style>
 {% endblock %}
 
 {% block content %}
-{% if not data %}
-  <div class="no-data">
-    <h2>No stories yet today</h2>
-    <p>Hit <code>GET /news/today</code> to generate today's digest, then refresh.</p>
-  </div>
-{% else %}
   <p class="page-title">{{ data.cluster_count }} stories · {{ data.generated_at[:10] }}</p>
   <div class="story-grid">
     {% for cluster in data.clusters %}
@@ -116,5 +104,4 @@
     </a>
     {% endfor %}
   </div>
-{% endif %}
 {% endblock %}
