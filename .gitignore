@@ -3,3 +3,5 @@
 .cache/
 __pycache__/
 *.pyc
+cdk.out/
+infra/cdk.out/
