@@ -1,4 +1,5 @@
 import logging
+import os
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -23,3 +24,9 @@ app.include_router(news.router)
 @app.get("/health", tags=["meta"])
 async def health() -> JSONResponse:
     return JSONResponse({"status": "ok"})
+
+
+# Lambda handler — only wired up when running inside AWS Lambda.
+if os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    from mangum import Mangum
+    handler = Mangum(app, lifespan="off")
