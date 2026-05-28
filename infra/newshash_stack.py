@@ -52,16 +52,21 @@ class NewshashStack(cdk.Stack):
         }
 
         # ── Container image (built from Dockerfile.lambda in project root) ────
-        image_code = lambda_.DockerImageCode.from_image_asset(
+        api_image_code = lambda_.DockerImageCode.from_image_asset(
             "..",
             file="Dockerfile.lambda",
+        )
+        scheduler_image_code = lambda_.DockerImageCode.from_image_asset(
+            "..",
+            file="Dockerfile.lambda",
+            cmd=["app.lambda_scheduler.handler"],
         )
 
         # ── API Lambda — serves HTTP requests via API Gateway ─────────────────
         api_fn = lambda_.DockerImageFunction(
             self,
             "ApiFunction",
-            code=image_code,
+            code=api_image_code,
             memory_size=1024,
             # API Gateway hard limit is 29 s; cache hits are <1 s.
             # Cold-start generation (cache miss) may still timeout on first run
@@ -74,12 +79,10 @@ class NewshashStack(cdk.Stack):
         scheduler_fn = lambda_.DockerImageFunction(
             self,
             "SchedulerFunction",
-            code=image_code,
+            code=scheduler_image_code,
             memory_size=1024,
             timeout=Duration.minutes(10),
             environment=shared_env,
-            # Override the default CMD to point at the scheduler handler.
-            cmd=["app.lambda_scheduler.handler"],
         )
 
         # Grant both functions access to DynamoDB and Secrets Manager.
