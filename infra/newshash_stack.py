@@ -16,7 +16,7 @@ from aws_cdk import (
 from constructs import Construct
 
 
-class NewsmashStack(cdk.Stack):
+class NewshashStack(cdk.Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
@@ -24,7 +24,7 @@ class NewsmashStack(cdk.Stack):
         cache_table = dynamodb.Table(
             self,
             "CacheTable",
-            table_name="newsmash-cache",
+            table_name="newshash-cache",
             partition_key=dynamodb.Attribute(
                 name="pk", type=dynamodb.AttributeType.STRING
             ),
@@ -36,13 +36,13 @@ class NewsmashStack(cdk.Stack):
         # ── Secrets Manager — API key ─────────────────────────────────────────
         # After first deploy, set the value with:
         #   aws secretsmanager put-secret-value \
-        #     --secret-id newsmash/anthropic-api-key \
+        #     --secret-id newshash/anthropic-api-key \
         #     --secret-string "sk-ant-..."
         api_key_secret = secretsmanager.Secret(
             self,
             "AnthropicApiKey",
-            secret_name="newsmash/anthropic-api-key",
-            description="Anthropic API key for Newsmash",
+            secret_name="newshash/anthropic-api-key",
+            description="Anthropic API key for Newshash",
         )
 
         # ── Shared Lambda environment ─────────────────────────────────────────
@@ -138,12 +138,12 @@ class NewsmashStack(cdk.Stack):
         # ── Outputs ───────────────────────────────────────────────────────────
         CfnOutput(self, "AppUrl",
                   value=f"https://{distribution.distribution_domain_name}",
-                  description="Newsmash public URL (CloudFront)")
+                  description="Newshash public URL (CloudFront)")
         CfnOutput(self, "ApiGatewayUrl",
                   value=api.url,
                   description="Direct API Gateway URL (for debugging)")
         CfnOutput(self, "SecretArn",
                   value=api_key_secret.secret_arn,
-                  description="Set API key: aws secretsmanager put-secret-value --secret-id newsmash/anthropic-api-key --secret-string sk-ant-...")
+                  description="Set API key: aws secretsmanager put-secret-value --secret-id newshash/anthropic-api-key --secret-string sk-ant-...")
         CfnOutput(self, "CacheTableName",
                   value=cache_table.table_name)

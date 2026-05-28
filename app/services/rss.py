@@ -58,7 +58,7 @@ def _clean_summary(raw: str) -> str:
 
 async def fetch_all_feeds() -> list[RawStory]:
     async with httpx.AsyncClient(
-        headers={"User-Agent": "Newsmash/1.0 RSS reader"}
+        headers={"User-Agent": "Newshash/1.0 RSS reader"}
     ) as client:
         results = await asyncio.gather(
             *[_fetch_feed(client, source) for source in SOURCES]

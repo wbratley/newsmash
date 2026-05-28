@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     # On Lambda, set this to the Secrets Manager ARN; the key is fetched at startup.
     anthropic_api_key_secret_arn: str = ""
-    cache_table_name: str = "newsmash-cache"
+    cache_table_name: str = "newshash-cache"
     max_clusters: int = 10
     cluster_similarity_threshold: float = 0.25
     feed_timeout_seconds: int = 10

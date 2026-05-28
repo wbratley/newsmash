@@ -12,7 +12,7 @@ logging.basicConfig(
 )
 
 app = FastAPI(
-    title="Newsmash",
+    title="Newshash",
     description="Aggregates UK news RSS feeds across the political spectrum and synthesises balanced, unbiased story clusters using AI.",
     version="0.1.0",
 )
