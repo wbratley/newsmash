@@ -64,6 +64,37 @@ def load_today(key: str) -> dict | None:
         return None
 
 
+def load_date(key: str, date_str: str) -> dict | None:
+    """Load cache for a specific date (YYYY-MM-DD)."""
+    try:
+        if _CACHE_BACKEND == "dynamo":
+            table = _dynamo().Table(_table_name())
+            resp = table.get_item(Key={"pk": f"{date_str}_{key}"})
+            item = resp.get("Item")
+            return json.loads(item["data"]) if item else None
+        path = _CACHE_DIR / f"{date_str}_{key}.json"
+        return json.loads(path.read_text()) if path.exists() else None
+    except Exception as exc:
+        logger.warning("Cache read failed (%s/%s): %s", date_str, key, exc)
+        return None
+
+
+def list_cached_dates(key: str) -> list[str]:
+    """Return all dates with cached data for the given key, newest first."""
+    try:
+        if _CACHE_BACKEND == "dynamo":
+            return [date.today().isoformat()]
+        _CACHE_DIR.mkdir(exist_ok=True)
+        dates = sorted(
+            {p.name.replace(f"_{key}.json", "") for p in _CACHE_DIR.glob(f"*_{key}.json")},
+            reverse=True,
+        )
+        return dates
+    except Exception as exc:
+        logger.warning("list_cached_dates failed: %s", exc)
+        return []
+
+
 def save_today(key: str, data: dict) -> None:
     try:
         if _CACHE_BACKEND == "dynamo":
